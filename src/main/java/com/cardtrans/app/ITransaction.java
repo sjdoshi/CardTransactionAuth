@@ -23,4 +23,12 @@ public interface ITransaction {
 
     public Numeric getZipCode();
 
+    public void setResponse(ResponseCode responseCode) throws Exception;
+
+    public ResponseCode getResponse();
+
+    public String getResult() throws Exception;
+
+
+
 }

@@ -41,92 +41,19 @@ public class Highnote {
         //01107012250000001000ER
 
         for (String stTransaction : aStTransactions) {
-            ResponseCode responseCode = null;
 
+            //Construct transaction
             ITransaction transaction = new SimpleInterchangeTransaction(stTransaction);
 
-            if(!transaction.hasMandatoryDataFields()){
-                responseCode = ResponseCode.ER;
-            }
+            //run it through processor
+            TransactionProcessor processor = new TransactionProcessor(transaction);
+            ResponseCode responseCode = processor.process();
 
-            Numeric expMonth = transaction.getExpMonth();
-            Numeric expYear = transaction.getExpYear();
-
-            Numeric zipCode = transaction.getZipCode();
-            Numeric amount = transaction.getAmount();
-            LLVar PAN = transaction.getPAN();
-            LLVar cardHolder = transaction.getCardholderName();
-
-
-            if (responseCode == null) {
-                YearMonth yearMonthExpiry = YearMonth.of(2000+expYear.intValue(),expMonth.intValue());
-                boolean fDateExpired = yearMonthExpiry.isBefore(YearMonth.now());
-
-                boolean fValidAmount = false;
-                if ((zipCode != null && amount.intValue() < 20000)
-                        || (zipCode == null && amount.intValue() < 10000)) {
-                    fValidAmount = true;
-                    System.out.println("Card amount is valid!");
-                } else {
-                    System.out.println("Card amount is invalid!");
-                }
-
-                if(!fDateExpired && fValidAmount){
-                    responseCode = ResponseCode.OK;
-                }else{
-                    responseCode = ResponseCode.DE;
-                }
-
-            }
-
-
-
-
-            StringBuilder sbResponse = new StringBuilder();
-            transaction.getBitMapDataFields().getBitSet().set(4);
-            String stHex = HexFormat.of().formatHex(transaction.getBitMapDataFields().getBitSet().toByteArray());
-            System.out.println("Result Bitset Hex " + stHex);
-
-            sbResponse.append(MessageType.AUTH_RESPONSE_MESSAGE).append(stHex);
-            for (int i = 7; i > 1; i--) {
-                if (transaction.getBitMapDataFields().getBitSet().get(i)) {
-                    switch (i) {
-                        case 7:
-                            sbResponse.append(PAN.toString());
-                            break;
-
-                        case 6:
-                            sbResponse.append(expMonth).append(expYear);
-                            break;
-
-                        case 5:
-                            sbResponse.append(amount);
-                            break;
-
-                        case 4:
-                            sbResponse.append(responseCode);
-                            break;
-
-                        case 3:
-                            sbResponse.append(cardHolder);
-                            break;
-
-                        case 2:
-                            sbResponse.append(zipCode);
-                            break;
-
-                        default:
-                            throw new Exception("Invalid data");
-                    }
-                }
-
-            }
-            String stResponse = sbResponse.toString();
-            System.out.println("Response of " + stTransaction + " is " + stResponse);
+            //Set the result in the transaction and create a response
+            transaction.setResponse(responseCode);
+            String stResult = transaction.getResult();
+            System.out.println("Response of " + stTransaction + " is " + stResult);
         }
-
-
-
 
     }
 

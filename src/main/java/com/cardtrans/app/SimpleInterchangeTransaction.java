@@ -4,6 +4,8 @@ import com.cardtrans.datatype.BitmapDataFields;
 import com.cardtrans.datatype.LLVar;
 import com.cardtrans.datatype.Numeric;
 
+import java.util.HexFormat;
+
 
 public class SimpleInterchangeTransaction implements ITransaction{
 
@@ -16,6 +18,8 @@ public class SimpleInterchangeTransaction implements ITransaction{
     Numeric m_zipCode;
 
     StringTransactionReader m_reader;
+
+    ResponseCode m_response;
 
     public SimpleInterchangeTransaction(String stTransaction) throws Exception{
 
@@ -62,6 +66,42 @@ public class SimpleInterchangeTransaction implements ITransaction{
 
     }
 
+    private String constructResult(){
+        StringBuilder sb = new StringBuilder();
+        sb.append(MessageType.AUTH_RESPONSE_MESSAGE);
+
+        m_dataBitmap.getBitSet().set(4);
+        String stHex = HexFormat.of().formatHex(m_dataBitmap.getBitSet().toByteArray());
+        sb.append(stHex);
+        System.out.println("Result Bitset Hex " + stHex);
+
+        if(m_dataBitmap.hasPAN()) {
+            sb.append(m_PAN.toString());
+        }
+
+        if(m_dataBitmap.hasExpiryDate()) {
+            sb.append(m_expMonth).append(m_expYear);
+        }
+
+        if(m_dataBitmap.hasTransactionAmount()) {
+            sb.append(m_amount);
+        }
+
+        if(m_dataBitmap.hasResponseCode()) {
+            sb.append(m_response);
+        }
+
+        if(m_dataBitmap.hasCardHolderName()){
+            sb.append(m_cardholderName);
+        }
+
+        if(m_dataBitmap.hasZipCode()){
+            sb.append(m_zipCode);
+        }
+
+        return sb.toString();
+    }
+
     public boolean hasMandatoryDataFields() {
         return m_dataBitmap.hasMandatoryFields();
     }
@@ -100,5 +140,23 @@ public class SimpleInterchangeTransaction implements ITransaction{
 
     public Numeric getZipCode() {
         return m_zipCode;
+    }
+
+    public void setResponse(ResponseCode responseCode) throws Exception{
+        if(m_response!=null){
+            throw new Exception("Response" + m_response + " already set!");
+        }
+        m_response = responseCode;
+    }
+
+    public ResponseCode getResponse(){
+        return m_response;
+    }
+
+    public String getResult() throws Exception{
+        if(m_response==null){
+            throw new Exception("Response not set!");
+        }
+        return constructResult();
     }
 }
