@@ -1,4 +1,4 @@
-package com.example.cardtran;
+package com.cardtrans;
 
 import junit.framework.TestCase;
 
