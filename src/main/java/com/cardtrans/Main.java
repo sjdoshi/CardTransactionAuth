@@ -8,13 +8,8 @@ public class Main {
     public static void main(String[] args) {
         // Press ⌥⏎ with your caret at the highlighted text to see how
         // IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!" + "\r\n");
+        System.out.println("Hello and welcome!");
 
-        //0100e016411111111111111112250000001000
-        int i =0;
-        for(String st : args){
-            System.out.printf("Trans " + i++ + " " + st + "\r\n");
-        }
 
         try{
             //Initialize the application
@@ -25,6 +20,6 @@ public class Main {
         }
 
 
-        System.out.printf("Hello and welcome!" + "\r\n");
+        System.out.println("Goodbye!");
     }
 }

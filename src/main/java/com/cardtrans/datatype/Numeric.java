@@ -4,13 +4,10 @@ public class Numeric extends Number{
 
     int m_len;
     String m_stVal;
-    public Numeric(int len){
-        m_len = len;
-    }
 
-    public Numeric(int len, String stVal){
-        m_len = len;
+    public Numeric(String stVal){
         m_stVal = stVal;
+        m_len = stVal.length();
     }
 
 

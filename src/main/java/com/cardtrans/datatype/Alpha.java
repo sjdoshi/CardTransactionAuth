@@ -10,7 +10,10 @@ public class Alpha {
     public Alpha(int len, String stVal){
         m_iLen = len;
         m_stVal = stVal;
+        validateInput();
+    }
 
+    private void validateInput(){
         if(m_iLen!=m_stVal.length() || !m_stVal.matches("^[ a-zA-Z0-9\\s]+$")){
             throw new IllegalArgumentException("Invalid LLVar len=" + m_iLen + " val " + m_stVal);
         }
