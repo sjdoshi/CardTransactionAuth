@@ -1,6 +1,9 @@
 package com.cardtrans;
 
 import com.cardtrans.app.Highnote;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 // Press ⇧ twice to open the Search Everywhere dialog and type `show whitespaces`,
 // then press Enter. You can now see whitespace characters in your code.
@@ -10,13 +13,14 @@ public class Main {
         // IntelliJ IDEA suggests fixing it.
         System.out.println("Hello and welcome!");
 
+        Logger logger = LoggerFactory.getLogger(Main.class.getName());
 
         try{
             //Initialize the application
             Highnote highnote = new Highnote();
             highnote.processTransactions(args);
         }catch(Exception e){
-            System.out.println("Ignoring exception " + e.getMessage());
+            logger.error("Ignoring exception " + e.getMessage());
         }
 
 
