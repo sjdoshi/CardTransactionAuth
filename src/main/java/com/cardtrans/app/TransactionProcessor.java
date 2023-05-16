@@ -1,5 +1,8 @@
 package com.cardtrans.app;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.YearMonth;
 
 public class TransactionProcessor {
@@ -11,6 +14,8 @@ public class TransactionProcessor {
     }
 
     public ResponseCode process() {
+        Logger logger = LoggerFactory.getLogger(TransactionProcessor.class.getName());
+
         //Check for mandatory fields
         if(!m_transaction.hasMandatoryDataFields()){
             return ResponseCode.ER;
@@ -23,6 +28,7 @@ public class TransactionProcessor {
         if(!fDateExpired && fValidAmount){
             return ResponseCode.OK;
         }
+
         return ResponseCode.DE;
     }
 
@@ -32,13 +38,15 @@ public class TransactionProcessor {
     }
 
     private boolean approveEligibleAmount(){
+        Logger logger = LoggerFactory.getLogger(TransactionProcessor.class.getName());
+        logger.trace(String.format("Criteria amount %s zip %s",m_transaction.getAmount().longValue(),m_transaction.getZipCode()));
         boolean fValidAmount = false;
-        if ((m_transaction.getZipCode() != null && m_transaction.getAmount().intValue() < 20000)
-                || (m_transaction.getZipCode() == null && m_transaction.getAmount().intValue() < 10000)) {
+        if ((m_transaction.getZipCode() != null && m_transaction.getAmount().longValue() < 20000)
+                || (m_transaction.getZipCode() == null && m_transaction.getAmount().longValue() < 10000)) {
             fValidAmount = true;
-            System.out.println("Card amount is valid!");
+            logger.debug("Card amount is valid!");
         } else {
-            System.out.println("Card amount is invalid!");
+            logger.debug("Card amount is invalid!");
         }
         return fValidAmount;
     }

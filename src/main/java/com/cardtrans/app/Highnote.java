@@ -1,11 +1,8 @@
 package com.cardtrans.app;
 
-import com.cardtrans.datatype.BitmapDataFields;
-import com.cardtrans.datatype.LLVar;
-import com.cardtrans.datatype.Numeric;
-
-import java.time.YearMonth;
-import java.util.HexFormat;
+import com.cardtrans.Main;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Highnote {
 
@@ -14,9 +11,10 @@ public class Highnote {
     }
 
     public void processTransactions(String[] aStTransactions) throws Exception{
+        Logger logger = LoggerFactory.getLogger(Highnote.class.getName());
         for (String stTransaction : aStTransactions) {
             String stResult = processOneTransaction(stTransaction);
-            System.out.println("Response of " + stTransaction + " is " + stResult);
+            logger.info("Response of " + stTransaction + " is " + stResult);
         }
     }
 

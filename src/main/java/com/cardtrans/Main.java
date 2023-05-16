@@ -11,9 +11,12 @@ public class Main {
     public static void main(String[] args) {
         // Press ⌥⏎ with your caret at the highlighted text to see how
         // IntelliJ IDEA suggests fixing it.
+        Logger logger = LoggerFactory.getLogger(Main.class.getName());
+
+
         System.out.println("Hello and welcome!");
 
-        Logger logger = LoggerFactory.getLogger(Main.class.getName());
+
 
         try{
             //Initialize the application

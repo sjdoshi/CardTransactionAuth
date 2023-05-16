@@ -47,12 +47,12 @@
 
     //info,debug,warn,error
     <Loggers>
-        <Logger name="com.cardtrans.1" additivity="false" level="warn">
+        <Logger name="com.cardtrans" additivity="false" level="debug">
             <AppenderRef ref="fileLoggerDebug"  />
         </Logger>
 
 
-        <Root level="all" additivity="debug">
+        <Root level="info" additivity="false">
             <appender-ref ref="fileLoggerInfo" />
         </Root>
     </Loggers>

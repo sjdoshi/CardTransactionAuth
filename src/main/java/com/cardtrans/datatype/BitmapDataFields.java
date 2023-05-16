@@ -1,5 +1,9 @@
 package com.cardtrans.datatype;
 
+import com.cardtrans.app.SimpleInterchangeTransaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.BitSet;
 import java.util.HexFormat;
 
@@ -27,10 +31,11 @@ public class BitmapDataFields {
     }
 
     public boolean hasMandatoryFields(){
+        Logger logger = LoggerFactory.getLogger(BitmapDataFields.class.getName());
         BitSet bsMandatoryCopy = BitSet.valueOf(s_bsMandatoryFields.toByteArray());
         bsMandatoryCopy.andNot(m_bsFields);
         if (bsMandatoryCopy.cardinality() > 0) {
-            System.out.println("BitSet cardiniality " + bsMandatoryCopy.cardinality());
+            logger.trace("BitSet cardiniality " + bsMandatoryCopy.cardinality());
             return false;
         }
         return true;

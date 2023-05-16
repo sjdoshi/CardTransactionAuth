@@ -3,11 +3,26 @@ package com.cardtrans.app;
 import com.cardtrans.datatype.BitmapDataFields;
 import com.cardtrans.datatype.LLVar;
 import com.cardtrans.datatype.Numeric;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HexFormat;
 
 
 public class SimpleInterchangeTransaction implements ITransaction{
+
+    public static final int s_version = 1;
+
+    public static final int MESSAGE_TYPE_LEN = 4;
+    public static final int HEX_FIELDS_LEN = 2;
+    public static final int PAN_FIELD_LEN = 2;
+    public static final int MONTH_FIELD_LEN = 2;
+    public static final int YEAR_FIELD_LEN = 2;
+    public static final int AMOUNT_FIELD_LEN = 10;
+
+    public static final int CARDHOLDER_FIELD_LEN = 2;
+
+    public static final int ZIP_FIELD_LEN = 5;
 
     MessageType m_messageType;
     BitmapDataFields m_dataBitmap;
@@ -25,55 +40,57 @@ public class SimpleInterchangeTransaction implements ITransaction{
 
         m_reader = new StringTransactionReader(stTransaction);
 
-        String stMessageType = m_reader.readString(4);
+        String stMessageType = m_reader.readString(MESSAGE_TYPE_LEN);
         m_messageType = MessageType.parse(stMessageType);
 
-        String stHexDataFields = m_reader.readString(2);
+        String stHexDataFields = m_reader.readString(HEX_FIELDS_LEN);
         m_dataBitmap = new BitmapDataFields(stHexDataFields);
         parse();
     }
 
     public void parse() throws Exception{
+        Logger logger = LoggerFactory.getLogger(SimpleInterchangeTransaction.class.getName());
 
         if(m_dataBitmap.hasPAN()){
-            Numeric panLen = new Numeric(m_reader.readString(2));
+            Numeric panLen = new Numeric(m_reader.readString(PAN_FIELD_LEN));
             m_PAN = new LLVar(panLen, m_reader.readString(panLen.intValue()));
-            System.out.println("PAN " + m_PAN.getValue());
+            logger.debug("PAN " + m_PAN.getValue());
         }
 
         if(m_dataBitmap.hasExpiryDate()) {
-            m_expMonth = new Numeric(m_reader.readString(2));
-            System.out.println("ExpMonth " + m_expMonth.intValue());
-            m_expYear = new Numeric(m_reader.readString(2));
-            System.out.println("ExpYear " + m_expYear.intValue());
+            m_expMonth = new Numeric(m_reader.readString(MONTH_FIELD_LEN));
+            logger.debug("ExpMonth " + m_expMonth.intValue());
+            m_expYear = new Numeric(m_reader.readString(YEAR_FIELD_LEN));
+            logger.debug("ExpYear " + m_expYear.intValue());
         }
 
         if(m_dataBitmap.hasTransactionAmount()) {
-            m_amount = new Numeric(m_reader.readString(10));
-            System.out.println("Amount " + m_amount.intValue());
+            m_amount = new Numeric(m_reader.readString(AMOUNT_FIELD_LEN));
+            logger.debug("Amount " + m_amount.intValue());
         }
 
         if(m_dataBitmap.hasCardHolderName()) {
-            Numeric cardHolderLen = new Numeric(m_reader.readString(2));
+            Numeric cardHolderLen = new Numeric(m_reader.readString(CARDHOLDER_FIELD_LEN));
             m_cardholderName = new LLVar(cardHolderLen, m_reader.readString(cardHolderLen.intValue()));
-            System.out.println("CardHolder " + m_cardholderName);
+            logger.debug("CardHolder " + m_cardholderName);
         }
 
         if(m_dataBitmap.hasZipCode()) {
-            m_zipCode = new Numeric(m_reader.readString(5));
-            System.out.println("Zip " + m_zipCode.intValue());
+            m_zipCode = new Numeric(m_reader.readString(ZIP_FIELD_LEN));
+            logger.debug("Zip " + m_zipCode.intValue());
         }
 
     }
 
     private String constructResult(){
+        Logger logger = LoggerFactory.getLogger(SimpleInterchangeTransaction.class.getName());
         StringBuilder sb = new StringBuilder();
         sb.append(MessageType.AUTH_RESPONSE_MESSAGE);
 
         m_dataBitmap.getBitSet().set(4);
         String stHex = HexFormat.of().formatHex(m_dataBitmap.getBitSet().toByteArray());
         sb.append(stHex);
-        System.out.println("Result Bitset Hex " + stHex);
+        logger.info("Result Bitset Hex " + stHex);
 
         if(m_dataBitmap.hasPAN()) {
             sb.append(m_PAN.toString());
